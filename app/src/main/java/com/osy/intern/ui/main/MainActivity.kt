@@ -6,7 +6,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.osy.intern.R
 import com.osy.intern.data.repository.ImgRepository
 import com.osy.intern.databinding.ActivityMainBinding
@@ -42,9 +41,12 @@ class MainActivity : DaggerAppCompatActivity() {
     }
 
     private fun initObserve() {
-        mainViewModel.data.observe(this, Observer {
-            adapter.submitList(it.documents.toList())
-        })
+        with(mainViewModel) {
+            listData.observe(this@MainActivity, Observer {
+                adapter.submitList(it)
+            })
+        }
+
     }
 
     private fun initRecyclerView() {

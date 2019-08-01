@@ -1,9 +1,12 @@
 package com.osy.intern.ui.main
 
 import android.view.View
+import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.osy.intern.data.Sort
 import com.osy.intern.data.repository.ImgRepository
 import com.osy.intern.data.vo.ImgVO
@@ -17,14 +20,40 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     val data: LiveData<ImgVO>
         get() = _data
 
+    private val _listData = MutableLiveData<MutableList<ImgVO.Document>>()
+    val listData: LiveData<MutableList<ImgVO.Document>>
+        get() = _listData
+
     val searchText = MutableLiveData<String>()
-    val page = MutableLiveData<Int>()
     val sort: Sort = Sort.Accuracy
 
-    private val size = 20
+    private var page = 1
+    private val size = 10
 
-    init {
-        page.value = 1
+    val onScrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+
+            if ((recyclerView.layoutManager as GridLayoutManager).findLastVisibleItemPosition() == size * page - 1) {
+                page++
+                imgRepository
+                    .apply { page = this@MainViewModel.page }
+                    .getImageList(object : Callback<ImgVO> {
+                        override fun onResponse(call: Call<ImgVO>, response: Response<ImgVO>) {
+                            if (response.isSuccessful && response.body() != null) {
+                                _listData.value = mutableListOf<ImgVO.Document>().also {
+                                    it.addAll(_listData.value!!)
+                                    it.addAll(response.body()!!.documents)
+                                }
+                            }
+                        }
+
+                        override fun onFailure(call: Call<ImgVO>, t: Throwable) {
+                            t.printStackTrace()
+                        }
+                    })
+            }
+        }
     }
 
     fun searchClick(clickedView: View) {
@@ -33,11 +62,12 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
                 query = searchText.value
                 sort = this@MainViewModel.sort
                 size = this@MainViewModel.size
-                page = this@MainViewModel.page.value
+                page = this@MainViewModel.page
             }.getImageList(object : Callback<ImgVO> {
                 override fun onResponse(call: Call<ImgVO>, response: Response<ImgVO>) {
                     if (response.isSuccessful && response.body() != null) {
                         _data.postValue(response.body())
+                        _listData.postValue(response.body()!!.documents)
                     }
                 }
 
@@ -50,3 +80,19 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
         }
     }
 }
+
+@BindingAdapter("onScrolled")
+fun RecyclerView.onScrolled(onScrollListener: RecyclerView.OnScrollListener) {
+    addOnScrollListener(onScrollListener)
+}
+
+
+
+
+
+
+
+
+
+
+

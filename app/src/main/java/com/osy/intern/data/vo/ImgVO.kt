@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class ImgVO(
     var meta: Meta,
-    var documents: List<Document>
+    var documents: MutableList<Document>
 ) {
     data class Meta(
         @SerializedName("total_count") var totalCount: Int,
