@@ -6,6 +6,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.osy.intern.R
 import com.osy.intern.data.repository.ImgRepository
 import com.osy.intern.databinding.ActivityMainBinding
@@ -46,12 +47,11 @@ class MainActivity : DaggerAppCompatActivity() {
                 adapter.submitList(it)
             })
         }
-
     }
 
     private fun initRecyclerView() {
         adapter = ImgListAdapter(this)
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = GridLayoutManager(this, 2, RecyclerView.VERTICAL, false)
+        recyclerView.layoutManager = StaggeredGridLayoutManager( 2, RecyclerView.VERTICAL)
     }
 }

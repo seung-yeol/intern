@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.osy.intern.data.Sort
 import com.osy.intern.data.repository.ImgRepository
 import com.osy.intern.data.vo.ImgVO
@@ -34,7 +35,8 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
-            if ((recyclerView.layoutManager as GridLayoutManager).findLastVisibleItemPosition() == size * page - 1) {
+            //스크롤중 마지막 아이템을 보이게 된 경우 이미지 더 불러옴.
+            if ((recyclerView.layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).toList().contains(size * page - 1)) {
                 page++
                 imgRepository
                     .apply { page = this@MainViewModel.page }
@@ -57,6 +59,7 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     }
 
     fun searchClick(clickedView: View) {
+        page = 1
         if (!searchText.value.isNullOrEmpty()) {
             imgRepository.apply {
                 query = searchText.value
