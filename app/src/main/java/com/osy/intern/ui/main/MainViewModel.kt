@@ -13,37 +13,27 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(private val imgRepository: ImgRepository) : ViewModel() {
-    val searchText = MutableLiveData<String>()
-
     private val _data = MutableLiveData<ImgVO>()
     val data: LiveData<ImgVO>
         get() = _data
 
-    private val _sort = MutableLiveData<Sort>()
-    val sort: LiveData<Sort>
-        get() = _sort
+    val searchText = MutableLiveData<String>()
+    val page = MutableLiveData<Int>()
+    val sort: Sort = Sort.Accuracy
 
-    private val _page = MutableLiveData<Int>()
-    val page: LiveData<Int>
-        get() = _page
-
-    private val _size = MutableLiveData<Int>()
-    val size: LiveData<Int>
-        get() = _size
+    private val size = 20
 
     init {
-        _sort.value = Sort.Accuracy
-        _page.value = 1
-        _size.value = 10
+        page.value = 1
     }
 
     fun searchClick(clickedView: View) {
         if (!searchText.value.isNullOrEmpty()) {
             imgRepository.apply {
                 query = searchText.value
-                sort = _sort.value
-                page = _page.value
-                size = _size.value
+                sort = this@MainViewModel.sort
+                size = this@MainViewModel.size
+                page = this@MainViewModel.page.value
             }.getImageList(object : Callback<ImgVO> {
                 override fun onResponse(call: Call<ImgVO>, response: Response<ImgVO>) {
                     if (response.isSuccessful && response.body() != null) {
@@ -55,6 +45,8 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
                     t.printStackTrace()
                 }
             })
+        } else {
+            //토스트라도 띄워줍시다.
         }
     }
 }
