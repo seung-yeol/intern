@@ -9,5 +9,6 @@ import javax.inject.Singleton
 @Module
 abstract class ImgRepositoryModule {
     @Binds
+    @Singleton
     abstract fun bindImgRepository(imgRepository: ImgRepositoryImpl): ImgRepository
 }

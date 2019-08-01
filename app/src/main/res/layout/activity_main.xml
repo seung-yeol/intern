@@ -3,7 +3,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable name="mainViewModel" type="com.osy.intern.ui.main.MainViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,12 +24,13 @@
                 app:layout_constraintGuide_end="10dp"/>
 
         <EditText
-                android:id="@+id/edit_target"
+                android:id="@+id/edit_search"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_marginTop="10dp"
                 android:singleLine="true"
-                android:hint="검색어를 입력해주세요"
+                android:hint="@string/search_hint"
+                android:text="@={mainViewModel.searchText}"
                 app:layout_constraintEnd_toStartOf="@id/search_btn"
                 app:layout_constraintStart_toStartOf="@id/left_line"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -39,8 +40,9 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/ic_search"
-                app:layout_constraintBottom_toBottomOf="@id/edit_target"
-                app:layout_constraintTop_toTopOf="@id/edit_target"
+                android:onClick="@{mainViewModel::searchClick}"
+                app:layout_constraintBottom_toBottomOf="@id/edit_search"
+                app:layout_constraintTop_toTopOf="@id/edit_search"
                 app:layout_constraintEnd_toStartOf="@id/right_line"/>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -51,7 +53,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/left_line"
                 app:layout_constraintEnd_toStartOf="@id/right_line"
-                app:layout_constraintTop_toBottomOf="@id/edit_target"/>
+                app:layout_constraintTop_toBottomOf="@id/edit_search"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

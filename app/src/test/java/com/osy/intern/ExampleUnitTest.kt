@@ -22,9 +22,7 @@ class ExampleUnitTest {
 
     @Before
     fun setUp(){
-        imgRepository = ImgRepositoryImpl(ImgSearchAPI.Factory.create("01309a034e3420f15a0628168fa930d6"))
-//        imgRepository = ImgRepositoryImpl(ImgSearchAPI.Factory.create("58454a6b11a4f53ca401a41ded033fe4"))
-//        imgRepository = ImgRepositoryImpl(ImgSearchAPI.Factory.create("7dcccc098808141496798bab2ee7d3e1"))
+        imgRepository = ImgRepositoryImpl(ImgSearchAPI.Factory.create("7dcccc098808141496798bab2ee7d3e1"))
     }
 
     @Test

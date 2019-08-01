@@ -1,11 +1,12 @@
 package com.osy.intern.application
 
 import com.osy.intern.ui.main.MainActivity
+import com.osy.intern.ui.main.MainModule
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
 @Module
 abstract class ActivityBuilder {
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [MainModule::class])
     abstract fun bindMainActivity(): MainActivity
 }

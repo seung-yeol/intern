@@ -1,7 +1,5 @@
 package com.osy.intern.data.repository
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.osy.intern.data.Sort
 import com.osy.intern.data.api.ImgSearchAPI
@@ -12,21 +10,16 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class ImgRepositoryImpl @Inject constructor(private val mImgSearchAPI: ImgSearchAPI) : ImgRepository {
-    override fun doGetImageList(query: String, sort: Sort, page: Int, size: Int): LiveData<ImgVO> {
-        val data = MutableLiveData<ImgVO>()
+    override var query: String? = null
+    override var sort: Sort? = null
+    override var page: Int? = null
+    override var size: Int? = null
 
-        mImgSearchAPI.doGetImageList(query, sort.toString(), page, size).enqueue(object : Callback<ImgVO> {
-            override fun onResponse(call: Call<ImgVO>, response: Response<ImgVO>) {
-                if (response.isSuccessful && response.body() != null) {
-                    data.postValue(response.body())
-                }
-            }
+    override fun getImageList(query: String, sort: Sort, page: Int, size: Int, callback: Callback<ImgVO>) {
+        mImgSearchAPI.doGetImageList(query, sort.toString(), page, size).enqueue(callback)
+    }
 
-            override fun onFailure(call: Call<ImgVO>, t: Throwable) {
-                t.printStackTrace()
-            }
-        })
-
-        return data
+    override fun getImageList(callback: Callback<ImgVO>) {
+        getImageList(query!!, sort!!, page!!, size!!, callback)
     }
 }
