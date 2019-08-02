@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.util.Pair
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
@@ -14,6 +12,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.osy.intern.R
 import com.osy.intern.data.vo.ImgVO
 import com.osy.intern.databinding.ItemImgBinding
 import com.osy.intern.ui.detail.DetailActivity
@@ -33,7 +35,7 @@ class ImgListAdapter @Inject constructor(private val activity: AppCompatActivity
 
     private var itemWidth = 0   //가로세로 이미지 크기비율을 맞추기위해서 구함
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImgViewHolder {
-        itemWidth = parent.measuredWidth / 2
+        itemWidth = parent.measuredWidth / 2 - 10
         return ImgViewHolder(
             ItemImgBinding.inflate(LayoutInflater.from(parent.context), parent, false), activity
         )
@@ -43,23 +45,24 @@ class ImgListAdapter @Inject constructor(private val activity: AppCompatActivity
         val document = getItem(position)
         val itemHeight = (document.height.toDouble() / document.width * itemWidth).toInt()
 
+        val options = RequestOptions()
+            .placeholder(R.drawable.progress_animation)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .priority(Priority.HIGH)
+            .error(R.drawable.img_fail)
+            .dontAnimate()
+
         //이미지비율에 따라 이미지뷰의 크기를 조정하고 이미지 로드
         holder.itemView.img.apply {
             updateLayoutParams { height = itemHeight }
-            Glide.with(this).load(document.imageUrl).into(this)
+            Glide.with(activity).load(document.imageUrl).apply(options).into(this)
         }.setOnClickListener {
-            val intent = Intent(activity, DetailActivity::class.java).apply {
+            Intent(activity, DetailActivity::class.java).apply {
                 putExtra("bundle", Bundle().apply {
                     putParcelable("document", document)
                     putInt("imgHeight", itemHeight * 2)
                 })
-            }
-
-            //공유이미지 애니메이션 적용하여 액티비티 실행
-            val optionsCompat =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(activity, Pair.create(it, "imgTransition"))
-
-            activity.startActivity(intent, optionsCompat.toBundle())
+            }.also { activity.startActivity(it) }
         }
     }
 }
