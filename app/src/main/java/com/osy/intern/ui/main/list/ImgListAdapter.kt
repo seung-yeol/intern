@@ -1,7 +1,12 @@
 package com.osy.intern.ui.main.list
 
+import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
@@ -11,13 +16,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.osy.intern.data.vo.ImgVO
 import com.osy.intern.databinding.ItemImgBinding
+import com.osy.intern.ui.detail.DetailActivity
 import kotlinx.android.synthetic.main.item_img.view.*
+import javax.inject.Inject
 
-class ImgListAdapter(private val lifecycleOwner: LifecycleOwner) :
+class ImgListAdapter @Inject constructor(private val activity: AppCompatActivity) :
     ListAdapter<ImgVO.Document, ImgViewHolder>(
         object : DiffUtil.ItemCallback<ImgVO.Document>() {
-            override fun areItemsTheSame(oldItem: ImgVO.Document, newItem: ImgVO.Document): Boolean = oldItem == newItem
-            override fun areContentsTheSame(oldItem: ImgVO.Document, newItem: ImgVO.Document): Boolean = oldItem == newItem
+            override fun areItemsTheSame(oldItem: ImgVO.Document, newItem: ImgVO.Document): Boolean =
+                oldItem == newItem
+
+            override fun areContentsTheSame(oldItem: ImgVO.Document, newItem: ImgVO.Document): Boolean =
+                oldItem == newItem
         }
     ) {
 
@@ -25,7 +35,7 @@ class ImgListAdapter(private val lifecycleOwner: LifecycleOwner) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImgViewHolder {
         itemWidth = parent.measuredWidth / 2
         return ImgViewHolder(
-            ItemImgBinding.inflate(LayoutInflater.from(parent.context), parent, false), lifecycleOwner
+            ItemImgBinding.inflate(LayoutInflater.from(parent.context), parent, false), activity
         )
     }
 
@@ -37,6 +47,19 @@ class ImgListAdapter(private val lifecycleOwner: LifecycleOwner) :
         holder.itemView.img.apply {
             updateLayoutParams { height = itemHeight }
             Glide.with(this).load(document.imageUrl).into(this)
+        }.setOnClickListener {
+            val intent = Intent(activity, DetailActivity::class.java).apply {
+                putExtra("bundle", Bundle().apply {
+                    putParcelable("document", document)
+                    putInt("imgHeight", itemHeight * 2)
+                })
+            }
+
+            //공유이미지 애니메이션 적용하여 액티비티 실행
+            val optionsCompat =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity, Pair.create(it, "imgTransition"))
+
+            activity.startActivity(intent, optionsCompat.toBundle())
         }
     }
 }

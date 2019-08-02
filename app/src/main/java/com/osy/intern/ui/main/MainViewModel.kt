@@ -5,7 +5,6 @@ import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.osy.intern.data.Sort
@@ -25,18 +24,30 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     val listData: LiveData<MutableList<ImgVO.Document>>
         get() = _listData
 
+    private val _isItemClicked = MutableLiveData<Boolean>()
+    val isItemClicked: LiveData<Boolean>
+        get() = _isItemClicked
+
+
     val searchText = MutableLiveData<String>()
-    val sort: Sort = Sort.Accuracy
+    val sort: Sort = Sort.ACCURACY
 
     private var page = 1
     private val size = 10
+
+    init {
+        _isItemClicked.value = false
+    }
 
     val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
             //스크롤중 마지막 아이템을 보이게 된 경우 이미지 더 불러옴.
-            if ((recyclerView.layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).toList().contains(size * page - 1)) {
+            if ((recyclerView.layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).toList().contains(
+                    size * page - 1
+                )
+            ) {
                 page++
                 imgRepository
                     .apply { page = this@MainViewModel.page }
@@ -81,6 +92,10 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
         } else {
             //토스트라도 띄워줍시다.
         }
+    }
+
+    fun itemClick(clickedView: View) {
+        _isItemClicked.value = true
     }
 }
 

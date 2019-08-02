@@ -1,15 +1,22 @@
 package com.osy.intern.ui.main
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.LinearLayout
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
+import androidx.core.util.Pair
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.osy.intern.R
 import com.osy.intern.data.repository.ImgRepository
 import com.osy.intern.databinding.ActivityMainBinding
+import com.osy.intern.ui.detail.DetailActivity
 import com.osy.intern.ui.main.list.ImgListAdapter
 import com.osy.intern.ui.viewModelProvider
 import dagger.android.support.DaggerAppCompatActivity
@@ -21,9 +28,10 @@ class MainActivity : DaggerAppCompatActivity() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     @Inject
     lateinit var imgRepository: ImgRepository
+    @Inject
+    lateinit var adapter: ImgListAdapter
 
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var adapter: ImgListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +60,6 @@ class MainActivity : DaggerAppCompatActivity() {
     private fun initRecyclerView() {
         adapter = ImgListAdapter(this)
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = StaggeredGridLayoutManager( 2, RecyclerView.VERTICAL)
+        recyclerView.layoutManager = StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
     }
 }
