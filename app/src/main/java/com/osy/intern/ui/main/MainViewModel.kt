@@ -19,9 +19,13 @@ import javax.inject.Inject
 
 class MainViewModel @Inject constructor(private val imgRepository: ImgRepository) : ViewModel() {
     private val _imgData = MutableLiveData<MutableList<ImgVO.Document>>()
-
     val imgData: LiveData<MutableList<ImgVO.Document>>
         get() = _imgData
+
+    private val _isInit = MutableLiveData<Boolean>()
+    val isInit: LiveData<Boolean>
+        get() = _isInit
+
     val searchText = MutableLiveData<String>()
 
     private var meta : ImgVO.Meta? = null
@@ -44,6 +48,7 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     private val initData = { _ : Call<ImgVO>, response: Response<ImgVO> ->
         meta = response.body()!!.meta
         _imgData.postValue(response.body()!!.documents)
+        _isInit.postValue(true)
     }
 
     /*
@@ -58,7 +63,7 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
             }
             doSearch (initData)
         } else {
-            //토스트라도 띄워줍시다.
+            _isInit.value = false
         }
     }
 

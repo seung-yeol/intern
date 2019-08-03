@@ -1,6 +1,7 @@
 package com.osy.intern.ui.main
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -44,6 +45,11 @@ class MainActivity : DaggerAppCompatActivity() {
         with(mainViewModel) {
             imgData.observe(this@MainActivity, Observer {
                 adapter.submitList(it)
+            })
+
+            isInit.observe(this@MainActivity,Observer{
+                if (it) recyclerView.scrollToPosition(0)
+                else Toast.makeText(this@MainActivity, "검색어를 입력해주세요!", Toast.LENGTH_SHORT).show()
             })
         }
     }
