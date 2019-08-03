@@ -1,12 +1,14 @@
 package com.osy.intern.ui.main
 
 import android.view.View
+import android.widget.RadioGroup
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.osy.intern.R
 import com.osy.intern.data.Sort
 import com.osy.intern.data.repository.ImgRepository
 import com.osy.intern.data.vo.ImgVO
@@ -24,29 +26,19 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     val listData: LiveData<MutableList<ImgVO.Document>>
         get() = _listData
 
-    private val _isItemClicked = MutableLiveData<Boolean>()
-    val isItemClicked: LiveData<Boolean>
-        get() = _isItemClicked
-
-
     val searchText = MutableLiveData<String>()
-    val sort: Sort = Sort.ACCURACY
+    var sort = Sort.ACCURACY
 
     private var page = 1
     private val size = 10
 
-    init {
-        _isItemClicked.value = false
-    }
-
     val onScrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            super.onScrollStateChanged(recyclerView, newState)
+        override fun onScrollStateChanged(rv: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(rv, newState)
 
             //스크롤중 마지막 아이템을 보이게 된 경우 이미지 더 불러옴.
-            if ((recyclerView.layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).toList().contains(
-                    size * page - 1
-                )
+            if ((rv.layoutManager as StaggeredGridLayoutManager)
+                    .findLastVisibleItemPositions(null).toList().contains(size * page - 1)
             ) {
                 page++
                 imgRepository
@@ -69,8 +61,19 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
         }
     }
 
+    val onCheckedChangeListener = RadioGroup.OnCheckedChangeListener { _, checkedId ->
+        when (checkedId) {
+            R.id.btnAccuracy -> if (sort != Sort.ACCURACY) sort = Sort.ACCURACY
+            R.id.btnRecency -> if (sort != Sort.RECENCY) sort = Sort.RECENCY
+        }
+    }
+
     fun searchClick(clickedView: View) {
         page = 1
+        doSearch()
+    }
+
+    private fun doSearch() {
         if (!searchText.value.isNullOrEmpty()) {
             imgRepository.apply {
                 query = searchText.value
@@ -93,15 +96,16 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
             //토스트라도 띄워줍시다.
         }
     }
-
-    fun itemClick(clickedView: View) {
-        _isItemClicked.value = true
-    }
 }
 
 @BindingAdapter("onScrolled")
 fun RecyclerView.onScrolled(onScrollListener: RecyclerView.OnScrollListener) {
     addOnScrollListener(onScrollListener)
+}
+
+@BindingAdapter("onCheckedChange")
+fun RadioGroup.onCheckedChange(onCheckedChangeListener: RadioGroup.OnCheckedChangeListener) {
+    setOnCheckedChangeListener(onCheckedChangeListener)
 }
 
 

@@ -2,4 +2,6 @@
     <string name="app_name">오승열</string>
     <string name="kakao_restapi_key">7dcccc098808141496798bab2ee7d3e1</string>
     <string name="search_hint">검색어를 입력해주세요</string>
+    <string name="accuracy">정확도순</string>
+    <string name="recency">최신순</string>
 </resources>

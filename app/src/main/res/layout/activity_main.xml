@@ -31,14 +31,39 @@
                 android:singleLine="true"
                 android:hint="@string/search_hint"
                 android:text="@={mainViewModel.searchText}"
-                app:layout_constraintEnd_toStartOf="@id/search_btn"
+                app:layout_constraintEnd_toStartOf="@id/radio"
                 app:layout_constraintStart_toStartOf="@id/left_line"
                 app:layout_constraintTop_toTopOf="parent"/>
 
+        <RadioGroup
+                android:id="@+id/radio"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:checkedButton="@id/btnAccuracy"
+                app:onCheckedChange="@{mainViewModel.onCheckedChangeListener}"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintTop_toTopOf="@id/edit_search"
+                app:layout_constraintStart_toEndOf="@id/edit_search"
+                app:layout_constraintEnd_toStartOf="@+id/search_btn">
+            <RadioButton
+                    android:id="@+id/btnAccuracy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:textSize="12sp"
+                    android:text="@string/accuracy"/>
+            <RadioButton
+                    android:id="@+id/btnRecency"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:textSize="12sp"
+                    android:text="@string/recency"/>
+        </RadioGroup>
+
         <ImageButton
                 android:id="@+id/search_btn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:background="@drawable/ic_search"
                 android:onClick="@{mainViewModel::searchClick}"
                 app:layout_constraintBottom_toBottomOf="@id/edit_search"
