@@ -1,4 +1,4 @@
-package com.osy.intern.ui.main.list
+package com.osy.intern.ui.main
 
 import android.content.Intent
 import android.os.Bundle

@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.osy.intern.R
-import com.osy.intern.data.Sort
 import com.osy.intern.data.repository.ImgRepository
 import com.osy.intern.data.vo.ImgQueryVO
 import com.osy.intern.data.vo.ImgVO
@@ -70,8 +69,8 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     val onCheckedChangeListener = RadioGroup.OnCheckedChangeListener { _, checkedId ->
         imgQueryVO.let {
             when (checkedId) {
-                R.id.btnAccuracy -> it.sort = Sort.ACCURACY
-                R.id.btnRecency -> it.sort = Sort.RECENCY
+                R.id.btnAccuracy -> it.sort = ImgQueryVO.Sort.ACCURACY
+                R.id.btnRecency -> it.sort = ImgQueryVO.Sort.RECENCY
             }
         }
 
