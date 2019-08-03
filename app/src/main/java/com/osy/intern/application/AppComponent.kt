@@ -2,6 +2,7 @@ package com.osy.intern.application
 
 import com.osy.intern.data.api.ImgSearchAPIModule
 import com.osy.intern.data.repository.ImgRepositoryModule
+import com.osy.intern.ui.ActivityBuilder
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector

@@ -1,4 +1,4 @@
-package com.osy.intern.application
+package com.osy.intern.ui
 
 import com.osy.intern.ui.main.MainActivity
 import com.osy.intern.ui.main.MainModule

@@ -42,7 +42,7 @@ class MainActivity : DaggerAppCompatActivity() {
 
     private fun initObserve() {
         with(mainViewModel) {
-            listData.observe(this@MainActivity, Observer {
+            imgData.observe(this@MainActivity, Observer {
                 adapter.submitList(it)
             })
         }

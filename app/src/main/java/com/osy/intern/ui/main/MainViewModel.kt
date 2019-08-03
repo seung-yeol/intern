@@ -18,16 +18,13 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(private val imgRepository: ImgRepository) : ViewModel() {
-    private val _data = MutableLiveData<ImgVO>()
-    val data: LiveData<ImgVO>
-        get() = _data
+    private val _imgData = MutableLiveData<MutableList<ImgVO.Document>>()
 
-    private val _listData = MutableLiveData<MutableList<ImgVO.Document>>()
-    val listData: LiveData<MutableList<ImgVO.Document>>
-        get() = _listData
-
+    val imgData: LiveData<MutableList<ImgVO.Document>>
+        get() = _imgData
     val searchText = MutableLiveData<String>()
 
+    private var meta : ImgVO.Meta? = null
     private val imgQueryVO = ImgQueryVO()
 
     private fun doSearch(onResponse: (call: Call<ImgVO>, response: Response<ImgVO>) -> Unit) {
@@ -45,8 +42,8 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     }
 
     private val initData = { _ : Call<ImgVO>, response: Response<ImgVO> ->
-        _data.postValue(response.body())
-        _listData.postValue(response.body()!!.documents)
+        meta = response.body()!!.meta
+        _imgData.postValue(response.body()!!.documents)
     }
 
     /*
@@ -75,27 +72,28 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
         }
 
         //검색한 흔적이 있을때 재검색
-        _listData.value?.also {
-            imgQueryVO.page = 1
+        _imgData.value?.also {
             if (it.size > 0){
+                imgQueryVO.page = 1
                 doSearch (initData)
             }
         }
     }
 
-    //리스트 스크롤중 마지막 아이템을 보이게 된 경우 이미지 더 불러옴.
+    //리스트 스크롤중 마지막 아이템을 보이게 된 경우 이미지 더 불러옴. && 모든 이미지 불러오지 않았을때
     val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(rv: RecyclerView, newState: Int) {
             super.onScrollStateChanged(rv, newState)
-            if ((rv.layoutManager as StaggeredGridLayoutManager)
+            if (!meta!!.isEnd && (rv.layoutManager as StaggeredGridLayoutManager)
                     .findLastVisibleItemPositions(null).toList().contains(imgQueryVO.size * imgQueryVO.page - 1)
             ) {
-                imgQueryVO.page.plus(1)
+                imgQueryVO.page++
                 doSearch { _, response ->
-                    _listData.value = mutableListOf<ImgVO.Document>().also {
-                        it.addAll(_listData.value!!)
+                    meta = response.body()!!.meta
+                    _imgData.postValue( mutableListOf<ImgVO.Document>().also {
+                        it.addAll(_imgData.value!!)
                         it.addAll(response.body()!!.documents)
-                    }
+                    })
                 }
             }
         }
@@ -111,14 +109,3 @@ fun RecyclerView.onScrolled(onScrollListener: RecyclerView.OnScrollListener) {
 fun RadioGroup.onCheckedChange(onCheckedChangeListener: RadioGroup.OnCheckedChangeListener) {
     setOnCheckedChangeListener(onCheckedChangeListener)
 }
-
-
-
-
-
-
-
-
-
-
-
