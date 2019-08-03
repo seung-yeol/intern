@@ -28,7 +28,8 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
 
     val searchText = MutableLiveData<String>()
 
-    private var meta : ImgVO.Meta? = null
+    private var meta: ImgVO.Meta? = null
+    private var isWork: Boolean = false
     private val imgQueryVO = ImgQueryVO()
 
     private fun doSearch(onResponse: (call: Call<ImgVO>, response: Response<ImgVO>) -> Unit) {
@@ -45,7 +46,7 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
         })
     }
 
-    private val initData = { _ : Call<ImgVO>, response: Response<ImgVO> ->
+    private val initData = { _: Call<ImgVO>, response: Response<ImgVO> ->
         meta = response.body()!!.meta
         _imgData.postValue(response.body()!!.documents)
         _isInit.postValue(true)
@@ -61,7 +62,7 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
                 query = searchText.value!!
                 page = 1
             }
-            doSearch (initData)
+            doSearch(initData)
         } else {
             _isInit.value = false
         }
@@ -78,26 +79,28 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
 
         //검색한 흔적이 있을때 재검색
         _imgData.value?.also {
-            if (it.size > 0){
+            if (it.size > 0) {
                 imgQueryVO.page = 1
-                doSearch (initData)
+                doSearch(initData)
             }
         }
     }
 
-    //리스트 스크롤중 마지막 아이템을 보이게 된 경우 이미지 더 불러옴. && 모든 이미지 불러오지 않았을때
+    //api 실행 중 아니면서 && 모든 이미지 불러오지 않았을때 && 리스트 스크롤중 보여줄게 5개이하로 남았을 때
     val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(rv: RecyclerView, newState: Int) {
             super.onScrollStateChanged(rv, newState)
-            if (!meta!!.isEnd && (rv.layoutManager as StaggeredGridLayoutManager)
-                    .findLastVisibleItemPositions(null).toList().contains(imgQueryVO.size * imgQueryVO.page - 1)
+            if (!isWork && !meta!!.isEnd && (rv.layoutManager as StaggeredGridLayoutManager)
+                    .findLastVisibleItemPositions(null).toList()[1] > imgQueryVO.size * imgQueryVO.page - 6
             ) {
+                isWork = true
                 imgQueryVO.page++
                 doSearch { _, response ->
                     meta = response.body()!!.meta
-                    _imgData.postValue( mutableListOf<ImgVO.Document>().also {
+                    _imgData.postValue(mutableListOf<ImgVO.Document>().also {
                         it.addAll(_imgData.value!!)
                         it.addAll(response.body()!!.documents)
+                        isWork = false
                     })
                 }
             }
