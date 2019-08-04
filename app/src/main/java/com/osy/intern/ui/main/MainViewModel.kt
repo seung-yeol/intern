@@ -90,7 +90,7 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(rv: RecyclerView, newState: Int) {
             super.onScrollStateChanged(rv, newState)
-            if (!isWork && !meta!!.isEnd && (rv.layoutManager as StaggeredGridLayoutManager)
+            if (!isWork && (if (meta == null) false else !meta!!.isEnd) && (rv.layoutManager as StaggeredGridLayoutManager)
                     .findLastVisibleItemPositions(null).toList()[1] > imgQueryVO.size * imgQueryVO.page - 6
             ) {
                 isWork = true

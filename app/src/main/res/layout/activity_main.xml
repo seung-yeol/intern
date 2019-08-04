@@ -1,85 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".ui.main.MainActivity">
 
     <data>
         <variable name="mainViewModel" type="com.osy.intern.ui.main.MainViewModel"/>
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-        <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/left_line"
-                android:orientation="vertical"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                app:layout_constraintGuide_begin="10dp"/>
 
-        <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/right_line"
-                android:orientation="vertical"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                app:layout_constraintGuide_end="10dp"/>
+        <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <EditText
-                android:id="@+id/edit_search"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:singleLine="true"
-                android:hint="@string/search_hint"
-                android:text="@={mainViewModel.searchText}"
-                app:layout_constraintEnd_toStartOf="@id/radio"
-                app:layout_constraintStart_toStartOf="@id/left_line"
-                app:layout_constraintTop_toTopOf="parent"/>
+            <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_scrollFlags="scroll|snap"
+                    app:titleTextColor="@color/white"
+                    app:title="@string/app_name"/>
 
-        <RadioGroup
-                android:id="@+id/radio"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:orientation="horizontal"
-                android:checkedButton="@id/btnAccuracy"
-                app:onCheckedChange="@{mainViewModel.onCheckedChangeListener}"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintTop_toTopOf="@id/edit_search"
-                app:layout_constraintStart_toEndOf="@id/edit_search"
-                app:layout_constraintEnd_toStartOf="@+id/search_btn">
-            <RadioButton
-                    android:id="@+id/btnAccuracy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:textSize="12sp"
-                    android:text="@string/accuracy"/>
-            <RadioButton
-                    android:id="@+id/btnRecency"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:textSize="12sp"
-                    android:text="@string/recency"/>
-        </RadioGroup>
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    app:layout_scrollFlags="scroll|enterAlways">
+                <EditText
+                        android:id="@+id/edit_search"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:singleLine="true"
+                        android:hint="@string/search_hint"
+                        android:text="@={mainViewModel.searchText}"
+                        android:layout_alignParentStart="true"
+                        android:layout_toStartOf="@id/radio"/>
+                <RadioGroup
+                        android:id="@+id/radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:orientation="horizontal"
+                        android:checkedButton="@id/btnAccuracy"
+                        android:layout_toStartOf="@id/search_btn"
+                        app:onCheckedChange="@{mainViewModel.onCheckedChangeListener}">
+                    <RadioButton
+                            android:id="@+id/btnAccuracy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="50dp"
+                            android:textSize="12sp"
+                            android:text="@string/accuracy"/>
+                    <RadioButton
+                            android:id="@+id/btnRecency"
+                            android:layout_width="wrap_content"
+                            android:layout_height="50dp"
+                            android:textSize="12sp"
+                            android:text="@string/recency"/>
+                </RadioGroup>
 
-        <ImageButton
-                android:id="@+id/search_btn"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:background="@drawable/ic_search"
-                android:onClick="@{mainViewModel::searchClick}"
-                app:layout_constraintBottom_toBottomOf="@id/edit_search"
-                app:layout_constraintTop_toTopOf="@id/edit_search"
-                app:layout_constraintEnd_toStartOf="@id/right_line"/>
+                <ImageButton
+                        android:id="@+id/search_btn"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:background="@drawable/ic_search"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:onClick="@{mainViewModel::searchClick}"/>
+            </RelativeLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginBottom="10dp"
-                app:onScrolled="@{mainViewModel.onScrollListener}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/left_line"
-                app:layout_constraintEnd_toStartOf="@id/right_line"
-                app:layout_constraintTop_toBottomOf="@id/edit_search"/>
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                app:onScrolled="@{mainViewModel.onScrollListener}"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

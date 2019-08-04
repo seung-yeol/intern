@@ -41,6 +41,7 @@ class MainActivity : DaggerAppCompatActivity() {
             lifecycleOwner = this@MainActivity
         }
 
+        setSupportActionBar(toolbar)
         initRecyclerView()
         initObserve()
     }

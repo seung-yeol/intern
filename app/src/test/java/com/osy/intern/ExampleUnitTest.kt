@@ -1,6 +1,5 @@
 package com.osy.intern
 
-import com.osy.intern.data.Sort
 import com.osy.intern.data.api.ImgSearchAPI
 import com.osy.intern.data.repository.ImgRepository
 import com.osy.intern.data.repository.ImgRepositoryImpl
@@ -24,6 +23,5 @@ class ExampleUnitTest {
 
     @Test
     fun apiTest() {
-        imgRepository.doGetImageList("아이유", Sort.ACCURACY, 5, 5).value
     }
 }
