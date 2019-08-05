@@ -1,6 +1,8 @@
 package com.osy.intern.ui.main
 
+import android.content.Context
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -32,11 +34,8 @@ class MainActivity : DaggerAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewDataBinding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
         mainViewModel = viewModelProvider(viewModelFactory)
-
-        with(viewDataBinding) {
+        with(DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)) {
             mainViewModel = this@MainActivity.mainViewModel
             lifecycleOwner = this@MainActivity
         }
@@ -44,19 +43,6 @@ class MainActivity : DaggerAppCompatActivity() {
         setSupportActionBar(toolbar)
         initRecyclerView()
         initObserve()
-    }
-
-    private fun initObserve() {
-        with(mainViewModel) {
-            imgData.observe(this@MainActivity, Observer {
-                adapter.submitList(it)
-            })
-
-            isInit.observe(this@MainActivity, Observer {
-                if (it) recyclerView.scrollToPosition(0)
-                else Toast.makeText(this@MainActivity, "검색어를 입력해주세요!", Toast.LENGTH_SHORT).show()
-            })
-        }
     }
 
     private fun initRecyclerView() {
@@ -84,5 +70,25 @@ class MainActivity : DaggerAppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun initObserve() {
+        with(mainViewModel) {
+            imgData.observe(this@MainActivity, Observer {
+                adapter.submitList(it)
+            })
+
+            isInit.observe(this@MainActivity, Observer {
+                if (it) {
+                    recyclerView.scrollToPosition(0)
+                } else Toast.makeText(this@MainActivity, "검색어를 입력해주세요!", Toast.LENGTH_SHORT).show()
+            })
+
+            doKeyboardHide.observe(this@MainActivity, Observer {
+                (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                    editSearch.windowToken, 0
+                )
+            })
+        }
     }
 }

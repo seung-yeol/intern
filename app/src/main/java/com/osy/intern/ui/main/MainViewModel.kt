@@ -1,7 +1,10 @@
 package com.osy.intern.ui.main
 
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.RadioGroup
+import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,6 +28,10 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     private val _isInit = MutableLiveData<Boolean>()
     val isInit: LiveData<Boolean>
         get() = _isInit
+
+    private val _doKeyboardHide = MutableLiveData<Int>()
+    val doKeyboardHide: LiveData<Int>
+        get() = _doKeyboardHide
 
     val searchText = MutableLiveData<String>()
 
@@ -50,13 +57,14 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
         meta = response.body()!!.meta
         _imgData.postValue(response.body()!!.documents)
         _isInit.postValue(true)
+
     }
 
     /*
     * 여기서부터는 리스너들입니다.
     * */
     //검색버튼 클릭시
-    fun searchClick(clickedView: View) {
+    fun searchClick(clickedView: View?) {
         if (!searchText.value.isNullOrEmpty()) {
             imgQueryVO.apply {
                 query = searchText.value!!
@@ -106,6 +114,14 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
             }
         }
     }
+
+    val onEditorActionListener = TextView.OnEditorActionListener { v, actionId, event ->
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            _doKeyboardHide.value = 1
+            searchClick(null)
+        }
+        false
+    }
 }
 
 @BindingAdapter("onScrolled")
@@ -116,4 +132,9 @@ fun RecyclerView.onScrolled(onScrollListener: RecyclerView.OnScrollListener) {
 @BindingAdapter("onCheckedChange")
 fun RadioGroup.onCheckedChange(onCheckedChangeListener: RadioGroup.OnCheckedChangeListener) {
     setOnCheckedChangeListener(onCheckedChangeListener)
+}
+
+@BindingAdapter("onEditorAction")
+fun EditText.onEditorAction(onEditorActionListener: TextView.OnEditorActionListener) {
+    setOnEditorActionListener(onEditorActionListener)
 }
