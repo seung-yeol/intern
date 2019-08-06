@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.marginStart
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -25,7 +26,7 @@ import javax.inject.Inject
 
 class ImgListAdapter @Inject constructor(private val activity: AppCompatActivity) :
     ListPreloader.PreloadSizeProvider<ImgVO.Document>, ListPreloader.PreloadModelProvider<ImgVO.Document>,
-    ListAdapter<ImgVO.Document, ImgViewHolder>(
+    ListAdapter<ImgVO.Document, ImgListAdapter.ImgViewHolder>(
         object : DiffUtil.ItemCallback<ImgVO.Document>() {
             override fun areItemsTheSame(oldItem: ImgVO.Document, newItem: ImgVO.Document): Boolean =
                 oldItem == newItem
@@ -49,15 +50,16 @@ class ImgListAdapter @Inject constructor(private val activity: AppCompatActivity
         return Glide.with(activity).load(item.imageUrl)
     }
 
-    private var itemWidth = 0   //가로세로 이미지 크기비율을 맞추기위해서 구함
+    private var itemWidth = 0   // 가로길이에 비율을 곱하여 세로길이를 구할 것임.
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImgViewHolder {
-        itemWidth = parent.measuredWidth / 2 - 6
+        itemWidth = parent.width / 2
         return ImgViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_img, parent, false))
     }
 
     override fun onBindViewHolder(holder: ImgViewHolder, position: Int) {
         val document = getItem(position)
-        val itemHeight = (document.height.toDouble() / document.width * itemWidth).toInt()  //가로세로 크기비율만큼 이미지뷰 Height 구함.
+        val itemHeight = //가로세로 크기비율만큼 이미지뷰 Height 구함.
+            (document.height.toDouble() / document.width.toDouble() * (itemWidth - holder.itemView.marginStart * 2)).toInt()
         val options = RequestOptions()
             .placeholder(R.drawable.progress_animation)
             .override(itemWidth, itemHeight)
@@ -73,14 +75,17 @@ class ImgListAdapter @Inject constructor(private val activity: AppCompatActivity
             Intent(activity, DetailActivity::class.java).apply {
                 putExtra("bundle", Bundle().apply {
                     putParcelable("document", document)
-                    putInt("imgHeight", itemHeight * 2)
+                    putInt(
+                        "imgHeight",
+                        (document.height.toDouble() / document.width.toDouble() * (itemWidth + holder.itemView.marginStart * 2)).toInt() * 2
+                    )
                 })
             }.also { activity.startActivity(it) }
         }
     }
-}
 
-class ImgViewHolder(itemView: View) :
-    RecyclerView.ViewHolder(itemView) {
-    val img: ImageView = itemView.img
+    class ImgViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
+        val img: ImageView = itemView.img
+    }
 }

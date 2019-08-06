@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.osy.intern.R
+import com.osy.intern.application.App
 import com.osy.intern.data.repository.ImgRepository
 import com.osy.intern.data.vo.ImgQueryVO
 import com.osy.intern.data.vo.ImgVO
@@ -59,7 +60,6 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
         meta = response.body()!!.meta
         _imgData.postValue(response.body()!!.documents)
         _isInit.postValue(true)
-
     }
 
     /*
@@ -101,7 +101,7 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
         override fun onScrollStateChanged(rv: RecyclerView, newState: Int) {
             super.onScrollStateChanged(rv, newState)
             if (!isWork && (if (meta == null) false else !meta!!.isEnd) && (rv.layoutManager as StaggeredGridLayoutManager)
-                    .findLastVisibleItemPositions(null).toList()[1] > imgQueryVO.size * imgQueryVO.page - 6
+                    .findLastVisibleItemPositions(null).toList()[1] > imgQueryVO.size * imgQueryVO.page - App.SEARCH_SIZE / 2
             ) {
                 imgQueryVO.page++
                 doSearch { _, response ->
@@ -115,7 +115,7 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
         }
     }
 
-    val onEditorActionListener = TextView.OnEditorActionListener { v, actionId, event ->
+    val onEditorActionListener = TextView.OnEditorActionListener { _, actionId, _ ->
         //키보드의 확인버튼을 누르면 search버튼을 클릭한 것과 같은 효과.
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             _doKeyboardHide.value = 1

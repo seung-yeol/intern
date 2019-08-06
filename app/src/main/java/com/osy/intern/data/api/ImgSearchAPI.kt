@@ -9,7 +9,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ImgSearchAPI {
-
     @GET("image")
     fun doGetImageList(@Query("query") query: String,
                        @Query("sort") sort: String,
