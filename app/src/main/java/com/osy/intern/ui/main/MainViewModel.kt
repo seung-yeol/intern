@@ -36,14 +36,16 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     val searchText = MutableLiveData<String>()
 
     private var meta: ImgVO.Meta? = null
-    private var isWork: Boolean = false
+    private var isWork: Boolean = false //true인 경우 검색실행x
     private val imgQueryVO = ImgQueryVO()
 
     private fun doSearch(onResponse: (call: Call<ImgVO>, response: Response<ImgVO>) -> Unit) {
+        isWork = true
         imgRepository.getImageList(imgQueryVO, object : Callback<ImgVO> {
             override fun onResponse(call: Call<ImgVO>, response: Response<ImgVO>) {
                 if (response.isSuccessful && response.body() != null) {
                     onResponse(call, response)
+                    isWork = false
                 }
             }
 
@@ -101,14 +103,12 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
             if (!isWork && (if (meta == null) false else !meta!!.isEnd) && (rv.layoutManager as StaggeredGridLayoutManager)
                     .findLastVisibleItemPositions(null).toList()[1] > imgQueryVO.size * imgQueryVO.page - 6
             ) {
-                isWork = true
                 imgQueryVO.page++
                 doSearch { _, response ->
                     meta = response.body()!!.meta
                     _imgData.postValue(mutableListOf<ImgVO.Document>().also {
                         it.addAll(_imgData.value!!)
                         it.addAll(response.body()!!.documents)
-                        isWork = false
                     })
                 }
             }
@@ -116,6 +116,7 @@ class MainViewModel @Inject constructor(private val imgRepository: ImgRepository
     }
 
     val onEditorActionListener = TextView.OnEditorActionListener { v, actionId, event ->
+        //키보드의 확인버튼을 누르면 search버튼을 클릭한 것과 같은 효과.
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             _doKeyboardHide.value = 1
             searchClick(null)

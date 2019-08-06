@@ -49,12 +49,14 @@ class MainActivity : DaggerAppCompatActivity() {
         adapter = ImgListAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+        //RecyclerViewPreloader는 기본적으로 LinearLayoutManager를 베이스로 하고 있어서 다른 매니저를 사용하는 경우 새로이 OnScrollListener를 만들어서 사용해야함.
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             private var lastFirstVisible = -1
             private var lastVisibleCount = -1
             private var lastItemCount = -1
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                //최대 10개 미리 로드.
                 val listPreloader = ListPreloader(Glide.with(this@MainActivity), adapter, adapter, 10)
                 val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
 
@@ -74,16 +76,19 @@ class MainActivity : DaggerAppCompatActivity() {
 
     private fun initObserve() {
         with(mainViewModel) {
+            //imgData갱신 되면 리스트어뎁터에 갱신 요청
             imgData.observe(this@MainActivity, Observer {
                 adapter.submitList(it)
             })
 
+            //리스트에 보여줄 데이터 초기화성공하면 스크롤 최상위, 실패하는 경우는 검색어입력 하라고 토스트메시지 노출
             isInit.observe(this@MainActivity, Observer {
                 if (it) {
                     recyclerView.scrollToPosition(0)
                 } else Toast.makeText(this@MainActivity, "검색어를 입력해주세요!", Toast.LENGTH_SHORT).show()
             })
 
+            //키보드 내림.
             doKeyboardHide.observe(this@MainActivity, Observer {
                 (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
                     editSearch.windowToken, 0
